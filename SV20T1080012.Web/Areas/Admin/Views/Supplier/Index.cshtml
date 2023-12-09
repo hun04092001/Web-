@@ -1,0 +1,123 @@
+﻿@model SV20T1080012.Web.Models.PaginationSearchSuppliers
+@{
+    ViewBag.Tilte = "Danh sách nhà cung cấp";
+    int nextPage = Model.Page + 1;
+    int previousPage = Model.Page - 1;
+}
+
+<div class=" box box-primary">
+    <div class="box-body ">
+        <!-- form tìm kiếm-->
+        <form action="~/Admin/Supplier" method="get" class="sidebar-form">
+            <div class="input-group">
+                <input type="text" name="searchValue" value="@Model.SearchValue" class="form-control" placeholder="Tìm kiếm nhà cung cấp">
+                <span class="input-group-btn">
+                    <button type="submit" name="search" id="search-btn" class="btn btn-flat">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    <a href="~/Admin/Supplier/Create" class=" btn btn-flat btn-primary">
+                        <i class=" fa fa-plus"> Bổ sung</i>
+                    </a>
+                </span>
+            </div>
+        </form>
+        <!--Danh sách nhà cung cấp-->
+        <p>
+            Có <strong>@string.Format("{0:N0}",Model.RowCount)</strong> nhà cung cấp. Hiện đang ở trang <strong>@Model.Page</strong> trên tổng số <strong>@Model.PageCount</strong> trang
+        </p>
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <div class="alert alert-warning">
+                <p>@ViewBag.ErrorMessage</p>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+        {
+            <div class="alert alert-success">
+                <p>@ViewBag.SuccessMessage</p>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.AddSuccessMessage))
+        {
+            <div class="alert alert-success">
+                <p>@ViewBag.AddSuccessMessage</p>
+            </div>
+        }
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>Tên nhà cung cấp</th>
+                        <th>Tên giao dịch</th>
+                        <th>Tỉnh</th>
+                        <th>Địa chỉ</th>
+                        <th>Điện thoại</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td>@item.SupplierName</td>
+                            <td>@item.ContactName</td>
+                            <td>@item.Provice</td>
+                            <td>@item.Address</td>
+                            <td>@item.Phone</td>
+                            <td>@item.Email</td>
+                            <td>
+                                <a href="~/Admin/Supplier/Edit/@item.SupplierID" class=" btn btn-xs btn-info">
+                                    <i class=" fa fa-edit"></i>
+                                </a>
+                                <a href="~/Admin/Supplier/Delete/@item.SupplierID" class=" btn btn-xs btn-danger">
+                                    <i class=" fa fa-remove"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <!--Phân trang-->
+        <div class="text-center">
+            <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+                <ul class="pagination">
+                    @if (Model.Page > 1)
+                    {
+                        <li class="paginate_button previous" id="example2_previous">
+                            <a href="~/Admin/Supplier?page=@(Model.Page - 1)&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="0" tabindex="0">Previous</a>
+                        </li>
+                    }
+                    @for (int i = 1; i <= Model.PageCount; i++)
+                    {
+                        if (i == Model.Page)
+                        {
+                            <li class="paginate_button active">
+                                <a href="#" aria-controls="example2" data-dt-idx="@i" tabindex="0">@i</a>
+                            </li>
+                        }
+                        else if (i <= 4 || i > Model.PageCount - 4 || (i >= Model.Page - 2 && i <= Model.Page + 2))
+                        {
+                            <li class="page_link">
+                                <a href="~/Admin/Supplier?page=@i&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="" tabindex="@i">@i</a>
+                            </li>
+                        }
+                        else if (i == Model.Page - 4 || i == Model.Page + 4)
+                        {
+                            <li class="paginate_button">
+                                <a href="#" aria-controls="example2" data-dt-idx="" tabindex="0">...</a>
+                            </li>
+                        }
+                    }
+                    @if (Model.Page < Model.PageCount)
+                    {
+                        <li class="paginate_button next" id="example2_next">
+                            <a href="~/Admin/Supplier?page=@(Model.Page + 1)&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="" tabindex="0">Next</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+

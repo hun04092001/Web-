@@ -1,0 +1,141 @@
+﻿@model SV20T1080012.Web.Models.PaginationSearchEmployee
+@{
+    ViewBag.Title = "Nhân viên";
+    int nextPage = Model.Page + 1;
+    int previousPage = Model.Page - 1;
+}
+
+<div class="box box-primary">
+    <div class="box-body box-profile">
+        <form action="~/Admin/Employee" method="get" class="sidebar-form">
+            <div class="input-group">
+                <input type="text" name="searchValue" value="@Model.SearchValue" class="form-control" placeholder="Tìm kiếm nhân viên">
+                <span class="input-group-btn">
+                    <button type="submit" name="searchValue" id="search-btn"
+                            class="btn btn-flat" fdprocessedid="i72i1r" style="background-color:#e3e8e9">
+                        <i class="fa fa-search"></i>
+                    </button>
+                    <a href="~/Admin/Employee/Create" class="btn btn-flat btn-primary" style="background-color:#374850">
+                        <i class="fa fa-plus"> Bổ sung</i>
+                    </a>
+                </span>
+            </div>
+        </form>
+
+        <!-- danh sách nhân viên-->
+
+        <p>
+            Có <strong>@string.Format("{0:N0}" , Model.RowCount)</strong> nhân viên . Hiện đang ở trang <strong>@Model.Page</strong> trên tổng số <strong>@Model.PageCount</strong> trang
+        </p>
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <div class="alert alert-warning">
+                <p>@ViewBag.ErrorMessage</p>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+        {
+            <div class="alert alert-success">
+                <p>@ViewBag.SuccessMessage</p>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.AddSuccessMessage))
+        {
+            <div class="alert alert-success">
+                <p>@ViewBag.AddSuccessMessage</p>
+            </div>
+        }
+
+        <div class="row">
+            @foreach (var item in Model.Data)
+            {
+                <div class="col-md-4">
+                    <!-- Profile Image -->
+                    <div class="box box-info">
+                        <div class="box-body box-profile ">
+                            <div class="container-fluid">
+                                <div class="row" style="border-bottom:1px dotted #888888">
+                                    <div class="col-sm-8"><p>@item.FullName</p></div>
+                                    <div class="col-sm-4">
+                                        <td class="text-right">
+                                            <a href="~/Admin/Employee/Edit/@item.EmployeeID" class="btn btn-xs btn-info">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+
+                                            <a href="~/Admin/Employee/ChangePass/@item.EmployeeID" class="btn btn-xs btn-warning">
+                                                <i class="fa fa-key"></i>
+                                            </a>
+
+                                            <a href="~/Admin/Employee/Delete/@item.EmployeeID" class="btn btn-xs btn-danger">
+                                                <i class="fa fa-remove"></i>
+                                            </a>
+                                        </td>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-4">
+                                        <img class="profile-user-img img-responsive" src="~/images/Employee/@item.Photo" alt="User profile picture">
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <div class="" style="border-bottom:1px dotted #888888">
+                                            <p><i class="fa fa-birthday-cake"></i> @string.Format("{0:dd/MM/yyyy}",item.BirthDate) </p>
+                                        </div>
+                                        <div class="" style="border-bottom:1px dotted #888888">
+                                            <p><i class="fa fa-phone"></i> @item.Phone</p>
+                                        </div>
+                                        <div class="" style="border-bottom:1px dotted #888888">
+                                            <p><i class="fa fa-envelope"></i> @item.Address</p>
+                                        </div>
+                                        <div class="" style="border-bottom:1px dotted #888888">
+                                            <p><i class="fa fa-envelope"></i> @item.Email</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <!--Phân trang-->
+        <div class="text-center">
+            <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+                <ul class="pagination">
+                    @if (Model.Page > 1)
+                    {
+                        <li class="paginate_button previous" id="example2_previous">
+                            <a href="~/Admin/Employee?page=@(Model.Page - 1)&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="0" tabindex="0">Previous</a>
+                        </li>
+                    }
+                    @for (int i = 1; i <= Model.PageCount; i++)
+                    {
+                        if (i == Model.Page)
+                        {
+                            <li class="paginate_button active">
+                                <a href="#" aria-controls="example2" data-dt-idx="@i" tabindex="0">@i</a>
+                            </li>
+                        }
+                        else if (i <= 4 || i > Model.PageCount - 4 || (i >= Model.Page - 2 && i <= Model.Page + 2))
+                        {
+                            <li class="page_link">
+                                <a href="~/Admin/Employee?page=@i&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="" tabindex="@i">@i</a>
+                            </li>
+                        }
+                        else if (i == Model.Page - 4 || i == Model.Page + 4)
+                        {
+                            <li class="paginate_button">
+                                <a href="#" aria-controls="example2" data-dt-idx="" tabindex="0">...</a>
+                            </li>
+                        }
+                    }
+                    @if (Model.Page < Model.PageCount)
+                    {
+                        <li class="paginate_button next" id="example2_next">
+                            <a href="~/Admin/Employee?page=@(Model.Page + 1)&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="" tabindex="0">Next</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

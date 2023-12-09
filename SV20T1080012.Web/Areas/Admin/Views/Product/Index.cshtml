@@ -1,0 +1,149 @@
+﻿@model SV20T1080012.Web.Models.PaginationSearchProduct
+@{
+    ViewBag.Title = "Mặt hàng";
+    int nextPage = Model.Page + 1;
+    int previousPage = Model.Page - 1;
+}
+
+<div class="container-fluid box box-primary">
+    <div class="box-header">
+    </div>
+    <div class="box-body">
+        <form action="~/Admin/Product" method="get">
+            <div class="row">
+                <div class="col-sm-3">
+                    <select class="form-control" name="category">
+                        <option>-- Loại hàng --</option>
+                        <option>Mỹ phẩm</option>
+                        <option>Thực phẩm</option>
+                    </select>
+                </div>
+                <div class="col-sm-3">
+                    <select class="form-control" name="category">
+                        <option>-- Nhà cung cấp --</option>
+                        <option>Công ty TNHH Thành Công</option>
+                        <option>Vina Foods</option>
+                    </select>
+                </div>
+                <div class="col-sm-6 input-group">
+                    <input type="text" name="searchValue" value="@Model.SearchValue"
+                           
+                           class="form-control"
+                           placeholder="Nhập tên mặt hàng cần tìm">
+                    <span class="input-group-btn">
+                        <button type="submit" name="search" id="search-btn" class="btn btn-flat btn-info">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        <a href="~/Admin/Product/Create"
+                           class="btn btn-flat btn-primary"
+                           style="margin-left:5px;">
+                            <i class="fa fa-plus"></i> Bổ sung
+                        </a>
+                    </span>
+                </div>
+            </div>
+        </form>
+
+        <!-- danh sách mặt hàng-->
+
+        <p>
+            Có <strong>@string.Format("{0:N0}" , Model.RowCount)</strong> mặt hàng . Hiện đang ở trang <strong>@Model.Page</strong> trên tổng số <strong>@Model.PageCount</strong> trang
+        </p>
+        @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+        {
+            <div class="alert alert-warning">
+                <p>@ViewBag.ErrorMessage</p>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.SuccessMessage))
+        {
+            <div class="alert alert-success">
+                <p>@ViewBag.SuccessMessage</p>
+            </div>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.AddSuccessMessage))
+        {
+            <div class="alert alert-success">
+                <p>@ViewBag.AddSuccessMessage</p>
+            </div>
+        }
+
+        <div class="table-responsive">
+            
+            <table class="table table-bordered table-hover table-striped">
+                <thead>
+                    <tr class="bg-primary">
+                        <th style="width:80px">Ảnh</th>
+                        <th>Tên mặt hàng</th>
+                        <th>Đơn vị tính</th>
+                        <th>Giá</th>
+                        <th style="width:75px">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td>
+                                <img src="~/images/Product/@item.Photo" style="width:80px" />
+                            </td>
+                            <td style="vertical-align:middle">@item.ProductName</td>
+                            <td style="vertical-align:middle">@item.Unit</td>
+                            <td style="vertical-align:middle">@item.Price</td>
+                            <td class="text-right" style="vertical-align:middle">
+                                <a href="~/Admin/Product/Edit/@item.ProductID" class="btn btn-xs btn-flat btn-info">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <a href="~/Admin/Product/Delete/@item.ProductID" class="btn btn-xs btn-flat btn-danger">
+                                    <i class="fa fa-remove"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            
+        </div>
+    </div>
+
+    <div class="text-center">
+        <div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+            <ul class="pagination">
+                @if (Model.Page > 1)
+                {
+                    <li class="paginate_button previous" id="example2_previous">
+                        <a href="~/Admin/Product?page=@(Model.Page - 1)&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="0" tabindex="0">Previous</a>
+                    </li>
+                }
+                @for (int i = 1; i <= Model.PageCount; i++)
+                {
+                    if (i == Model.Page)
+                    {
+                        <li class="paginate_button active">
+                            <a href="#" aria-controls="example2" data-dt-idx="@i" tabindex="0">@i</a>
+                        </li>
+                    }
+                    else if (i <= 4 || i > Model.PageCount - 4 || (i >= Model.Page - 2 && i <= Model.Page + 2))
+                    {
+                        <li class="page_link">
+                            <a href="~/Admin/Product?page=@i&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="" tabindex="@i">@i</a>
+                        </li>
+                    }
+                    else if (i == Model.Page - 4 || i == Model.Page + 4)
+                    {
+                        <li class="paginate_button">
+                            <a href="#" aria-controls="example2" data-dt-idx="" tabindex="0">...</a>
+                        </li>
+                    }
+                }
+                @if (Model.Page < Model.PageCount)
+                {
+                    <li class="paginate_button next" id="example2_next">
+                        <a href="~/Admin/Product?page=@(Model.Page + 1)&searchValue=@Model.SearchValue" aria-controls="example2" data-dt-idx="" tabindex="0">Next</a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+

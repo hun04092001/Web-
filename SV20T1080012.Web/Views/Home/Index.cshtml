@@ -1,0 +1,45 @@
+﻿@model HomeIndexModel // phai? khai bao' dung' kieu du? lieu truyen` vao`, IEnumberale : kiểu dữ liệu dạng tập hợp như list, arr
+@{
+    ViewData["Title"] = "Home Page";
+}
+<h1>@Model.TitleMessage</h1>
+<table class="table table-bordered">
+    <thead>
+        <tr class=" table-info" >
+            <th>Person Id</th>
+            <th>Name</th>
+            <th>LivePlace</th>
+            <th>Email</th>
+        </tr>
+    </thead>
+    <tbody>
+            @foreach (var item in Model.ListOfPersons )// model là kiểu dữ liệu action truyền vào 
+            {
+            <tr>
+                    <td>@item?.PersonId </td>
+                    <td>@item?.Name </td>
+                    <td>@item?.LivePlace </td>
+                    <td>@item?.Email </td>
+            </tr>
+            }
+     </tbody>
+</table>
+<table class="table table-bordered">
+    <thead>
+        <tr class=" table-info">
+            <th>Student ID</th>
+            <th>Student Name</th>
+           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.ListOfStudents)// model là kiểu dữ liệu action truyền vào
+        {
+            <tr>
+                <td>@item?.StudentId </td>
+                <td>@item?.StudentName </td>
+               
+            </tr>
+        }
+    </tbody>
+</table>
