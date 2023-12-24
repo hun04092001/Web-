@@ -16,7 +16,7 @@ namespace SV20T1080012.BusinessLayers
 
         static UserAccountService()
         {
-            string connectionString = "server=DESKTOP-O4C41DD\\SQLEXPRESS;user id=sa; password=123;database=LiteCormmerceDB;TrustServerCertificate=True";
+            string connectionString = "server=DESKTOP-O4C41DD\\HUNG0409;user id=sa; password=123;database=LiteCormmerceDB;TrustServerCertificate=True";
 
             employeeUserAccountDB = new DataLayers.SQLServer.EmployeeUserAccountDAL(connectionString);
         }

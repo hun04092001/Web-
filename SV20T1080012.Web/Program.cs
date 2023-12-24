@@ -3,15 +3,17 @@ using SV20T1080012.Web.AppCodes;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddControllersWithViews()
     .AddMvcOptions(option =>
     {
         option.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true;// tắt thông báo lỗi mặc định
-    }     
+    }
     );
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(option =>
@@ -21,7 +23,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         option.AccessDeniedPath = "/Account/AccessDenied";
         option.ExpireTimeSpan = TimeSpan.FromMinutes(60);// thời gian đăng nhập 60 phút
     });
-    
+
 builder.Services.AddSession(
     option =>
     {
@@ -49,7 +51,7 @@ app.UseEndpoints(endpoints =>
     endpoints.MapAreaControllerRoute(
         name: "areaAdmin",
         areaName: "Admin",
-        pattern : "admin/{controller=Dashboard}/{action=Index}/{id?}"
+        pattern: "admin/{controller=Dashboard}/{action=Index}/{id?}"
         );
     endpoints.MapControllerRoute(
       name: "areas",

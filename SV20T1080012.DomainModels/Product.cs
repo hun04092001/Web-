@@ -8,14 +8,33 @@ namespace SV20T1080012.DomainModels
 {
     public class Product
     {
-        public int ProductID { get; set; }
+        public int ProductId { get; set; }
         public string ProductName { get; set; } = "";
         public string ProductDescription { get; set; } = "";
-        public int SupplierID { get; set; } 
-        public int CategoryID { get; set; } 
+        public int SupplierId { get; set; }
+        public int CategoryId { get; set; }
         public string Unit { get; set; } = "";
-        public string Price { get; set; } = "";
-        public string Photo { get; set; } = " ";
-        public bool isSelling { get; set; } = true;
+        public decimal Price { get; set; }
+        public string Photo { get; set; } = "";
+        public bool IsSelling { get; set; }
+    }
+
+    public class ProductPhoto
+    {
+        public long PhotoId { get; set; }
+        public int ProductId { get; set; }
+        public string Photo { get; set; } = "";
+        public string Description { get; set; } = "";
+        public int DisplayOrder { get; set; }
+        public bool IsHidden { get; set; }
+    }
+
+    public class ProductAttribute
+    {
+        public long AttributeId { get; set; }
+        public int ProductId { get; set; }
+        public string AttributeName { get; set; } = "";
+        public string AttributeValue { get; set; } = "";
+        public int DisplayOrder { get; set; }
     }
 }

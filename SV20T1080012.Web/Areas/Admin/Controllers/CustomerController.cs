@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SV20T1080012.BusinessLayers;
 using SV20T1080012.DomainModels;
+using SV20T1080012.Web.AppCodes;
 using SV20T1080012.Web.Models;
 
 namespace SV20T1080012.Web.Areas.Admin.Controllers
@@ -10,21 +11,62 @@ namespace SV20T1080012.Web.Areas.Admin.Controllers
     [Area("Admin")]
     public class CustomerController : Controller
     {
+        private const string CUSTOMER_SEARCH = "Customer_Search";
         private const int PAGE_SIZE = 10;
-        public IActionResult Index(int page = 1, string searchValue = "")
+       // public IActionResult Index(int page = 1, string searchValue = "")
+       // {
+
+            //int rowCount = 0;
+            //var data = CommonDataService.ListOfCustommers(out rowCount, page, PAGE_SIZE, searchValue ?? "");
+            //var model = new PaginationSearchCustomer()
+            //{ 
+            //        Page = page,
+            //        PageSize = PAGE_SIZE,
+            //        SearchValue = searchValue ?? "",
+            //        RowCount = rowCount,
+            //        Data = data
+            //        };
+
+            //string? errorMessage = Convert.ToString(TempData["ErrorMessage"]);
+            //ViewBag.ErrorMessage = errorMessage;
+
+            //string? successMessage = Convert.ToString(TempData["SuccessMessage"]);
+            //ViewBag.SuccessMessage = successMessage;
+
+            //string? addsuccessMessage = Convert.ToString(TempData["AddSuccessMessage"]);
+            //ViewBag.AddSuccessMessage = addsuccessMessage;
+
+            //return View(model);
+       // }
+       public IActionResult Index()
         {
+            var input = ApplicationContext.GetSessionData<PaginationSearchInput>(CUSTOMER_SEARCH);
+            if(input == null)
+            {
+                input = new PaginationSearchInput()
+                {
+                    Page = 1,
+                    PageSize = PAGE_SIZE,
+                    SearchValue = ""
+                };
+            }
+           
+
+            return View(input);
+        }
+        public IActionResult Search(PaginationSearchInput input) {
 
             int rowCount = 0;
-            var data = CommonDataService.ListOfCustommers(out rowCount, page, PAGE_SIZE, searchValue ?? "");
+            var data = CommonDataService.ListOfCustomers(out rowCount, input.Page, input.PageSize, input.SearchValue ?? "");
             var model = new PaginationSearchCustomer()
-            { 
-                    Page = page,
-                    PageSize = PAGE_SIZE,
-                    SearchValue = searchValue ?? "",
-                    RowCount = rowCount,
-                    Data = data
-                    };
-
+            {
+                        Page = input.Page,
+                        PageSize = input.PageSize,
+                       SearchValue = input.SearchValue ?? "",
+                       RowCount = rowCount,
+                        Data = data
+                       };
+            ApplicationContext.SetSessionData(CUSTOMER_SEARCH, input);//lưu lại điều kiện tìm kiếm
             string? errorMessage = Convert.ToString(TempData["ErrorMessage"]);
             ViewBag.ErrorMessage = errorMessage;
 
@@ -33,9 +75,9 @@ namespace SV20T1080012.Web.Areas.Admin.Controllers
 
             string? addsuccessMessage = Convert.ToString(TempData["AddSuccessMessage"]);
             ViewBag.AddSuccessMessage = addsuccessMessage;
-
             return View(model);
-        }
+            }
+       
         // create khách hàng
         public IActionResult Create()
         {

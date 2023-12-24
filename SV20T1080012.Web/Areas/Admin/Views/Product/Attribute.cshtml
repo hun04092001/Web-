@@ -1,30 +1,35 @@
-﻿@{
+﻿@model SV20T1080012.DomainModels.ProductAttribute
+@{
 
 }
 
 <div class="box box-primary">
-    
-    <div class="box-body">
-        <form class="form-horizontal" action="#" method="post">
 
+    <div class="box-body">
+        <form class="form-horizontal" action="~/Admin/Product/SaveAttribute" method="post" enctype="multipart/form-data">
+            @Html.HiddenFor(m => m.ProductId)
+            @Html.HiddenFor(m => m.AttributeId)
             <div class="form-group">
                 <label class="control-label col-sm-2">Tên thuộc tính:</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="AttributeName" autofocus>
+                    @Html.ValidationMessageFor(m => m.AttributeName, "", new { @style = "color:#f00" })
+                    @Html.TextBoxFor(m => m.AttributeName, new { @class = "form-control", type = "text", autofocus = "autofocus" })
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="control-label col-sm-2">Giá trị thuộc tính:</label>
                 <div class="col-sm-10">
-                    <input type="text" class="form-control" name="AttributeValue" autofocus>
+                    @Html.ValidationMessageFor(m => m.AttributeValue, "", new { @style = "color:#f00" })
+                    @Html.TextBoxFor(m => m.AttributeValue, new { @class = "form-control" })
                 </div>
             </div>
 
             <div class="form-group">
                 <label class="control-label col-sm-2">Thứ tự hiển thị:</label>
                 <div class="col-sm-10">
-                    <input type="number" class="form-control" name="DisplayOrder" autofocus>
+                    @Html.ValidationMessageFor(m => m.DisplayOrder, "", new { @style = "color:#f00" })
+                    @Html.TextBoxFor(m => m.DisplayOrder, new { @class = "form-control" })
                 </div>
             </div>
 
@@ -33,14 +38,12 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fa fa-save"></i> Lưu dữ liệu
                     </button>
-                    <a class="btn btn-warning" href="~/Admin/Product/Edit/123">
+                    <a class="btn btn-warning" href="~/Admin/Product/Edit/@Model.ProductId">
                         Quay lại
                     </a>
                 </div>
             </div>
         </form>
     </div>
-    
+
 </div>
-
-
