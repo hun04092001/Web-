@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SV20T1080012.BusinessLayer;
 using SV20T1080012.BusinessLayers;
+using SV20T1080012.DomainModels;
 using SV20T1080012.Web;
 using SV20T1080012.Web.AppCodes;
 using SV20T1080012.Web.Models;
@@ -92,7 +93,23 @@ namespace SV20T1080012.Web.Areas.Admin.Controllers
         /// <returns></returns>
         public IActionResult Details(int id = 0)
         {
-            return View();
+            //DONE: Code chức năng lấy và hiển thị thông tin của đơn hàng và chi tiết của đơn hàng
+            if (id < 0)
+            {
+                return RedirectToAction("Index");
+               
+            }
+            // lấy thông tin của một đơn hàng và chi tiết đơn hàng đó theo mã đơn hàng
+            var order = OrderService.GetOrder(id);
+            var orderDetails = OrderService.ListOrderDetails(id);
+
+            var data = new OrderDetailModels()
+            {
+                Order = order,
+                OrderDetails = orderDetails
+            };
+            ViewBag.ErrorMessage = TempData[ERROR_MESSAGE] ?? "";
+            return View(data);
         }
         /// <summary>
         /// Giao diện cập nhật thông tin chi tiết đơn hàng

@@ -74,7 +74,14 @@ namespace SV20T1080012.DomainModels
         /// Điện thoại của người giao hàng
         /// </summary>
         public string ShipperPhone { get; set; }
-
+        /// <summary>
+        /// tỉnh giao hàng
+        /// </summary>
+        public string DeliveryProvince { get; set; }
+        /// <summary>
+        /// địa chỉ giao hàng
+        /// </summary>
+        public string DeliveryAddress { get; set; }
         /// <summary>
         /// Mô tả trạng thái đơn hàng dựa trên mã trạng thái
         /// </summary>

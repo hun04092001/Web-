@@ -1,10 +1,12 @@
-﻿using Dapper;
+﻿using Azure;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using SV20T1080012.DomainModels;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,31 +27,7 @@ namespace SV20T1080012.DataLayers.SQLServer
         public OrderDAL(string connectionString) : base(connectionString)
         {
         }
-        /// <summary>
-        /// Chuyển dữ liệu từ SqlDataReader thành Order
-        /// </summary>
-        /// <param name="dbReader"></param>
-        /// <returns></returns>
-        private Order DataReaderToOrder(SqlDataReader dbReader)
-        {
-            return new Order()
-            {
-                
-
-            };
-        }
-        /// <summary>
-        /// Chuyển dữ liệu từ SqlDataReader thành OrderDetail
-        /// </summary>
-        /// <param name="dbReader"></param>
-        /// <returns></returns>
-        private OrderDetail DataReaderToOrderDetail(SqlDataReader dbReader)
-        {
-            return new OrderDetail()
-            {
-                
-            };
-        }
+        
 
         /// <summary>
         /// 
@@ -126,7 +104,7 @@ namespace SV20T1080012.DataLayers.SQLServer
         /// <returns></returns>
         public Order Get(int orderID)
         {
-            Order data = null;
+            Order? data = null;
 
             using (var connection = OpenConnection())
             {
@@ -157,8 +135,18 @@ namespace SV20T1080012.DataLayers.SQLServer
         /// <returns></returns>
         public OrderDetail GetDetail(int orderID, int productID)
         {
-            OrderDetail data = null;
-            
+            OrderDetail? data = null;
+            using (var connection = OpenConnection())
+            {
+                var sql = @"SELECT	od.*, p.ProductName, p.Unit, p.Photo		
+                                    FROM	OrderDetails AS od
+		                                    JOIN Products AS p ON od.ProductID = p.ProductID
+                                    WHERE	od.OrderID = @OrderID AND od.ProductID = @ProductID";
+                var parameters = new { OrderID = orderID,
+                                       ProductID = productID };
+                data = connection.QueryFirstOrDefault<OrderDetail>(sql: sql, param: parameters, commandType: CommandType.Text);
+                connection.Close();
+            }
             return data;
         }
         /// <summary>
@@ -172,7 +160,7 @@ namespace SV20T1080012.DataLayers.SQLServer
         public IList<Order> List(int page = 1, int pageSize = 0, int status = 0, string searchValue = "")
         {
 
-            List<Order> data = new List<Order>();
+           var data = new List<Order>();
             if (searchValue != "")
                 searchValue = "%" + searchValue + "%";
 
@@ -219,26 +207,22 @@ namespace SV20T1080012.DataLayers.SQLServer
         /// <returns></returns>
         public IList<OrderDetail> ListDetails(int orderID)
         {
-            List<OrderDetail> data = new List<OrderDetail>();
+            var data = new List<OrderDetail>();
             using (var connection = OpenConnection())
             {
-                var cmd = connection.CreateCommand();
-                cmd.CommandText = @"SELECT	od.*, p.ProductName, p.Unit, p.Photo		
+
+                var sql = @"SELECT	od.*, p.ProductName, p.Unit, p.Photo		
                                     FROM	OrderDetails AS od
 		                                    JOIN Products AS p ON od.ProductID = p.ProductID
                                     WHERE	od.OrderID = @OrderID";
-                cmd.CommandType = CommandType.Text;
-                cmd.Parameters.AddWithValue("@OrderID", orderID);
-
-                using (var dbReader = cmd.ExecuteReader(CommandBehavior.CloseConnection))
+                var parameters = new
                 {
-                    while (dbReader.Read())
-                    {
-                        data.Add(DataReaderToOrderDetail(dbReader));
-                    }
-                    dbReader.Close();
-                }
+                    orderID = orderID
+                    
+                };
+                data = (connection.Query<OrderDetail>(sql: sql, param: parameters, commandType: CommandType.Text)).ToList();
                 connection.Close();
+
             }
             return data;
         }
