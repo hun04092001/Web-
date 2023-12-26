@@ -41,6 +41,10 @@ namespace SV20T1080012.BusinessLayers
             rowCount = customerDB.Count(searchValue);
             return customerDB.List(page, pageSize, searchValue).ToList();
         }
+        public static List<Customer> ListOfCustomers(string searchValue = "")
+        {
+            return customerDB.List(1, 0, searchValue).ToList();
+        }
 
         public static Customer? GetCustomer(int id)
         {
@@ -240,6 +244,10 @@ namespace SV20T1080012.BusinessLayers
             rowCount = shipperDB.Count(searchValue);
             return shipperDB.List(page, pageSize, searchValue).ToList();
         }
+        public static List<Shipper> ListOfShippers(string searchValue = "")
+        {
+            return shipperDB.List(1, 0, searchValue).ToList();
+        }
 
         public static Shipper? GetShipper(int id)
         {
@@ -299,6 +307,11 @@ namespace SV20T1080012.BusinessLayers
             rowCount = employeeDB.Count(searchValue);
             return employeeDB.List(page, pageSize, searchValue).ToList();
         }
+        public static List<Employee> ListOfEmployees(string searchValue = "")
+        {
+            return employeeDB.List(1, 0, searchValue).ToList();
+        }
+
 
         public static Employee? GetEmployee(int id)
         {

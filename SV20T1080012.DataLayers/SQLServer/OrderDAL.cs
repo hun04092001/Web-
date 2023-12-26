@@ -38,10 +38,52 @@ namespace SV20T1080012.DataLayers.SQLServer
         public int Add(Order data, IEnumerable<OrderDetail> details)
         {
             int orderID = 0;
+            //Tạo đơn hàng mới trong CSDL
             using (var connection = OpenConnection())
             {
+                var sqlAddOrder = @"if exists(select * from Orders where OrderID = @OrderID)
+                                select -1
+                            else
+                                begin
+                                  INSERT INTO Orders(CustomerID, OrderTime, EmployeeID, AcceptTime, ShipperID, ShippedTime, FinishedTime, Status,DeliveryAddress)
+                                         VALUES(@CustomerID, @OrderTime, @EmployeeID, @AcceptTime, @ShipperID, @ShippedTime, @FinishedTime, @Status,@DeliveryAddress);
+                                         SELECT @@identity;  
+                                end";
+                var parameters = new
+                {
+                    OrderID = data.OrderID,
+                    CustomerID = data.CustomerID,
+                    OrderTime = data.OrderTime,
+                    EmployeeID  = data.EmployeeID,
+                    AcceptTime = data.AcceptTime,
+                    ShipperID = data.ShipperID,
+                    ShippedTime = data.ShippedTime,
+                    FinishedTime = data.FinishedTime,
+                    Status  = data.Status,
+                    DeliveryAddress = data.DeliveryAddress
+
+
+
+                };
+                orderID = connection.ExecuteScalar<int>(sql: sqlAddOrder, param: parameters, commandType: CommandType.Text);
+                //Bổ sung chi tiết cho đơn hàng có mã là orderID
                 
-            }
+                var sqlAddOrderDetail = @"INSERT INTO OrderDetails(OrderID, ProductID, Quantity, SalePrice) " +
+                                         "VALUES(@OrderID, @ProductID, @Quantity, @SalePrice)";
+                foreach (var item in details)
+                {
+                    var orderDetailsparameters = new
+                    {
+                        orderID = orderID,
+                        productID = item.ProductID,
+                        quantity = item.Quantity,
+                        salePrice = item.SalePrice,
+                    };
+                    connection.Execute(sqlAddOrderDetail, orderDetailsparameters);
+                }
+
+                connection.Close();
+            };
             return orderID;
         }
         /// <summary>
@@ -65,9 +107,10 @@ namespace SV20T1080012.DataLayers.SQLServer
                                             LEFT JOIN Shippers AS s ON o.ShipperID = s.ShipperID
                                     WHERE   (@Status = 0 OR o.Status = @Status)
                                         AND (@SearchValue = N'' OR c.CustomerName LIKE @SearchValue OR s.ShipperName LIKE @SearchValue)";
-                var parameters = new { 
-                                        SearchValue = searchValue,
-                                        Status = status
+                var parameters = new {
+                                        Status = status,
+                                        SearchValue = searchValue
+                                        
                                     };
                 count = connection.ExecuteScalar<int>(sql: sql, param: parameters, commandType: CommandType.Text);
                 connection.Close();
@@ -82,8 +125,17 @@ namespace SV20T1080012.DataLayers.SQLServer
         public bool Delete(int orderID)
         {
             bool result = false;
-            
+            using (var connection = OpenConnection())
+            {
+                var sql = @"DELETE FROM OrderDetails WHERE OrderID = @OrderID;
+                            DELETE FROM Orders WHERE OrderID = @OrderID;";
+                var parameters = new { OrderID = orderID };
+                result = connection.Execute(sql: sql, param: parameters, commandType: CommandType.Text) > 0;
+                connection.Close();
+            }
             return result;
+
+
         }
         /// <summary>
         /// 
@@ -94,7 +146,15 @@ namespace SV20T1080012.DataLayers.SQLServer
         public bool DeleteDetail(int orderID, int productID)
         {
             bool result = false;
-           
+            using (var connection = OpenConnection())
+            {
+                var sql = @"DELETE FROM OrderDetails WHERE OrderID = @OrderID AND ProductID = @ProductID";
+                var parameters = new { OrderID = orderID,
+                                       ProductID = productID
+                                     };
+                result = connection.Execute(sql: sql, param: parameters, commandType: CommandType.Text) > 0;
+                connection.Close();
+            }
             return result;
         }
         /// <summary>
@@ -167,7 +227,7 @@ namespace SV20T1080012.DataLayers.SQLServer
             using (var connection = OpenConnection())
             {
                 var sql = @"SELECT  *
-                                    FROM    (
+                                    FROM     (
                                             SELECT  o.*,
                                                     c.CustomerName,
                                                     c.ContactName as CustomerContactName,
@@ -231,10 +291,42 @@ namespace SV20T1080012.DataLayers.SQLServer
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
+
         public int SaveDetail(int orderID, int productID, int quantity, decimal salePrice)
         {
             int result = 0;
-           
+            using (var connection = OpenConnection())
+            {
+                var sql = @"
+                       -- Kiểm tra sự tồn tại của productId trong đơn hàng orderId
+                            IF EXISTS (SELECT 1 FROM OrderDetails WHERE OrderID = @orderID AND ProductID = @productID)
+                            BEGIN
+                                -- Nếu tồn tại, cập nhật số lượng bằng tổng của số lượng hiện tại và @quantity
+                                UPDATE OrderDetails
+                                SET Quantity = @quantity,
+                                    SalePrice = @salePrice
+                                WHERE OrderID = @orderID AND ProductID = @productID;
+                            END
+                            ELSE
+                            BEGIN
+                                -- Nếu không tồn tại, thực hiện truy vấn INSERT mới
+                                INSERT INTO OrderDetails (OrderID, ProductID, Quantity, SalePrice)
+                                VALUES (@orderID, @productID, @quantity, @salePrice);
+                            END;
+
+                            -- Trả về số dòng được ảnh hưởng
+                            SELECT @@ROWCOUNT AS AffectedRows;";
+
+                var parameters = new
+                {
+                    orderID = orderID,
+                    productID = productID,
+                    quantity = quantity,
+                    salePrice = salePrice
+                };
+
+                result = connection.ExecuteScalar<int>(sql: sql, param: parameters, commandType: CommandType.Text);
+            }
             return result;
         }
         /// <summary>
@@ -245,8 +337,34 @@ namespace SV20T1080012.DataLayers.SQLServer
         public bool Update(Order data)
         {
             bool result = false;
-           
+            using (var connection = OpenConnection())
+            {
+                var sql = @"UPDATE Orders
+                                    SET     CustomerID = @CustomerID,
+                                            OrderTime = @OrderTime,
+                                            EmployeeID = @EmployeeID,
+                                            AcceptTime = @AcceptTime,
+                                            ShipperID = @ShipperID,
+                                            ShippedTime = @ShippedTime,
+                                            FinishedTime = @FinishedTime,
+                                            Status = @Status
+                                    WHERE   OrderID = @OrderID";
+                var parameters = new
+                {
+                    OrderID = data.OrderID,
+                    CustomerID = data.CustomerID ,
+                    Ordertime = data.OrderTime,
+                    EmployeeID = data.EmployeeID,
+                    AcceptTime = data.AcceptTime,
+                    ShipperID = data.ShipperID,
+                    ShippedTime = data.ShippedTime,
+                    FinishedTime = data.FinishedTime,
+                    Status = data.Status
+
+                };
+                result = connection.Execute(sql: sql, param: parameters, commandType: CommandType.Text) > 0;
+            }
             return result;
         }
-    }
+    } 
 }

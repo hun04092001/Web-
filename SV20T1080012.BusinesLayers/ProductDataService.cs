@@ -1,7 +1,7 @@
 ﻿using SV20T1080012.DataLayers;
 using SV20T1080012.DomainModels;
 
-namespace SV20T1080012.BusinessLayer
+namespace SV20T1080012.BusinessLayers
 {
     /// <summary>
     /// Các nghiệp vụ quản lý hàng hóa
